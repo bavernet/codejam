@@ -1,5 +1,6 @@
 // problem: https://projecteuler.net/problem=5
 // hint: math, lcm
+// level: easy
 #include <iostream>
 #include <algorithm>
 
