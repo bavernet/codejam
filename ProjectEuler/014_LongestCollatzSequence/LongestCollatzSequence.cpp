@@ -1,3 +1,6 @@
+// problem: https://projecteuler.net/problem=14
+// hint: math, dynamic programming
+// level: easy
 #include <iostream>
 
 #define MAX_T   (10000)
@@ -27,16 +30,19 @@ inline int getLenOfChain(int64_t n) {
 }
 
 inline int solve(int n) {
-	int maxLen = 0;
-	int start = 0;
-	for(int i = 1; i <= n; ++i) {
+	static int cache[MAX_N+1] = { 0, };
+	static int maxLen = 0;
+	static int maxStart = 0;
+	static int last = 0;
+	for(int i = last + 1; i <= n; ++i, ++last) {
 		int len = getLenOfChain(i);
 		if(len >= maxLen) {
 			maxLen = len;
-			start = i;
+			maxStart = i;
 		}
+		cache[i] = maxStart;
 	}
-	return start;
+	return cache[n];
 }
 
 int main(void) {
