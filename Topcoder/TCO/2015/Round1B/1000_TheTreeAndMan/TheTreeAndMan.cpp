@@ -19,9 +19,6 @@ public:
 			tree[i].clear();
 		}
 		memset(size, 0, sizeof(int)*(parent.size()+1));
-		memset(head, 0, sizeof(int)*(parent.size()+1));
-		memset(neck, 0, sizeof(int)*(parent.size()+1));
-		memset(heap, 0, sizeof(int)*(parent.size()+1));
 		memset(legs, 0, sizeof(int)*(parent.size()+1));
 		makeTree(parent);
 		return findHead(0);
@@ -29,10 +26,7 @@ public:
 
 private:
 	int findHead(int root) {
-		int &cnt = head[root];
-		if(cnt > 0)
-			return cnt;
-
+		int cnt = 0;
 		vector<int> &children = tree[root];
 		for(int child : children) {
 			cnt = ADD(cnt, findHead(child));
@@ -42,10 +36,7 @@ private:
 	}
 
 	int findNeck(int root) {
-		int &cnt = neck[root];
-		if(cnt > 0)
-			return cnt;
-
+		int cnt = 0;
 		vector<int> &children = tree[root];
 		for(int child : children) {
 			cnt = ADD(cnt, findNeck(child));
@@ -55,40 +46,38 @@ private:
 	}
 
 	int findHeap(int root) {
-		int &cnt = heap[root];
-		if(cnt > 0)
-			return cnt;
-
+		int cnt = 0;
 		vector<int> &children = tree[root];
 		for(int child : children)
 			cnt = ADD(cnt, findHeap(child));
+		cnt = ADD(cnt, findLegs(root));
+		return cnt;
+	}
 
-		cnt = ADD(cnt, findLegs(root, -1));
+	int findLegs(int root) {
+		int &cnt = legs[root];
+		vector<int> &children = tree[root];
+		if(cnt > 0)
+			return cnt;
+
+		for(int i = 0; i < children.size(); ++i) {
+			for(int j = i + 1; j < children.size(); ++j) {
+				cnt = ADD(cnt, getTreeSize(children[i]) * getTreeSize(children[j]));
+			}
+		}
 		return cnt;
 	}
 
 	int findLegs(int root, int except) {
-		int &cnt = legs[root];
 		vector<int> &children = tree[root];
-		if(cnt == 0) {
-			for(int i = 0; i < children.size(); ++i) {
-				for(int j = i + 1; j < children.size(); ++j) {
-					cnt = ADD(cnt, getTreeSize(children[i]) * getTreeSize(children[j]));
-				}
-			}
-		}
-		if(except < 0)
-			return cnt;
-
-		int exceptCnt = cnt;
+		int cnt = findLegs(root);
 		int exceptTreeSize = getTreeSize(except);
 		for(int i = 0; i < children.size(); ++i) {
 			if(children[i] == except)
 				continue;
-			exceptCnt = SUB(exceptCnt, getTreeSize(children[i]) * exceptTreeSize);
+			cnt = SUB(cnt, getTreeSize(children[i]) * exceptTreeSize);
 		}
-
-		return exceptCnt;
+		return cnt;
 	}
 
 	int getTreeSize(int root) {
@@ -100,7 +89,6 @@ private:
 		sz = 1;
 		for(int child : children)
 			sz += getTreeSize(child);
-
 		return sz;
 	}
 
@@ -113,9 +101,6 @@ private:
 private:
 	vector<int> tree[MAX_N+1];
 	int size[MAX_N+1];
-	int head[MAX_N+1];
-	int neck[MAX_N+1];
-	int heap[MAX_N+1];
 	int legs[MAX_N+1];
 };
 
