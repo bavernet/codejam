@@ -1,3 +1,6 @@
+// problem: http://codeforces.com/contest/586/problem/D
+// hint: backtracking, dp
+// level: easy
 #include <iostream>
 #include <string>
 #include <vector>
