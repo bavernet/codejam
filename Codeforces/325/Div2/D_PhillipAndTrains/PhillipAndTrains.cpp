@@ -11,23 +11,11 @@ using namespace std;
 bool visit[3][MAX_N+1];
 
 bool solve(const vector<string> &tunnel, int n, int si, int sj) {
-	if(si < 0 || si > 2 || sj < 0)
-		return false;
-
-	if(sj >= n)
-		return true;
-
-	if(visit[si][sj])
-		return false;
+	if(sj >= n)         return true;
+	if(visit[si][sj])   return false;
 	visit[si][sj] = true;
 
-	if(tunnel[si][sj] != '.')
-		return false;
-
-	if(sj + 1 == n)
-		return true;
-
-	if(tunnel[si][sj+1] != '.')
+	if(tunnel[si][sj] != '.' || tunnel[si][sj+1] != '.')
 		return false;
 
 	if(si - 1 >= 0 && tunnel[si-1][sj+1] == '.')
@@ -56,6 +44,7 @@ int main(void) {
 				si = i;
 				row[0] = '.';
 			}
+			row.push_back('.');
 			tunnel.push_back(row);
 		}
 
