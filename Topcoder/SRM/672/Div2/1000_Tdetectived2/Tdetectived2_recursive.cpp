@@ -1,49 +1,62 @@
+// problem: http://community.topcoder.com/stat?c=problem_statement&pm=14076&rd=16552
+// hint: graph, dfs, dp, recursive
+// level: moderate
 #include <iostream>
 #include <vector>
 #include <string>
-#include <cstring>
 #include <map>
+#include <algorithm>
+#include <climits>
+
+#define VISITED(s,i)    (((s) >> (i)) & 0x01)
+#define MAX_N           (20)
 
 using namespace std;
 
-unsigned int ans[20];
-
 class Tdetectived2 {
+private:
+	int ans[MAX_N];
+	map<int,bool> cache;
+
 public:
 	int reveal(vector<string> s) {
 		int answer = 0;
-		string level(s.size(), '0');
-		memset(ans, 0xFF, sizeof(ans));
-		reveal(s, level, 0, 0);
-		cout << "answer: ";
+		fill(ans, ans + s.size(), INT_MAX);
+		cache.clear();
+		reveal(s, 1 << 0, 0, 0);
 		for(int i = 1; i < s.size(); ++i) {
 			answer += i * ans[i];
-			cout << ans[i] << " ";
 		}
-		cout << endl;
 		return answer;
 	}
 
-	void reveal(vector <string> &s, string level, int idx, int round) {
-		static map<string,int> cache;
-
-		level[idx] = '0' - 1;
-		ans[idx] = min(ans[idx], (unsigned int)round);
-		if(cache[level] && cache[level] < round)
+	void reveal(const vector <string> &s, int state, int idx, int round) {
+		if(cache[state])
 			return ;
-		cache[level] = round;
+		cache[state] = true;
+		ans[idx] = min(ans[idx], round);
 
-		string &ev = s[idx];
-		for(int i = 1; i < ev.size(); ++i) {
-			if(level[i] >= '0') {
-				level[i] = max(level[i], ev[i]);
+		char maxVal = -1;
+		for(int i = 0; i < s.size(); ++i) {
+			if(VISITED(state, i)) {
+				const string &ev = s[i];
+				for(int j = 1; j < ev.size(); ++j) {
+					if(!VISITED(state, j) && maxVal < ev[j]) {
+						maxVal = ev[j];
+					}
+				}
 			}
 		}
-		char m = *max_element(level.begin(), level.end());
-		if(m >= '0') {
-			for(int i = 1; i < level.size(); ++i) {
-				if(level[i] == m) {
-					reveal(s, level, i, round + 1);
+		if(maxVal < 0)
+			return ;
+
+		for(int i = 0; i < s.size(); ++i) {
+			if(VISITED(state, i)) {
+				const string &ev = s[i];
+				for(int j = 1; j < ev.size(); ++j) {
+					if(!VISITED(state, j) && maxVal == ev[j]) {
+						reveal(s, state | (1 << j), j, round + 1);
+					}
 				}
 			}
 		}
