@@ -1,3 +1,6 @@
+// problem: http://community.topcoder.com/stat?c=problem_statement&pm=13717&rd=16433
+// hint: graph, dfs, dp
+// level: moderate
 #include <iostream>
 #include <vector>
 #include <string>
@@ -5,6 +8,7 @@
 #include <queue>
 #include <map>
 #include <utility>
+#include <climits>
 
 using namespace std;
 
@@ -23,29 +27,38 @@ private:
 	map<int,vector<int> > graph(const vector<string> &s) {
 		map<int,vector<int> > g;
 		map<int,bool> visit;
-		stack<pair<int,int> > st;
+		stack<int> st;
 
-		st.push(make_pair(0, 1 << 0));
+		st.push(1 << 0);
 		while(!st.empty()) {
-			pair<int,int> p = st.top();
-			int selected = p.first;
-			int state = p.second;
+			int state = st.top();
 			st.pop();
 
 			if(visit[state])
 				continue;
 			visit[state] = true;
 
-			const string &ev = s[selected];
-			char maxVal = getMax(ev, state);
+			char maxVal = -1;
+			for(int i = 0; i < s.size(); ++i) {
+				if((state >> i) & 0x01) {
+					const string &ev = s[i];
+					maxVal = max(maxVal, getMax(ev, state));
+				}
+			}
+
 			if(maxVal < 0)
 				continue;
 
-			for(int i = 1; i < ev.size(); ++i) {
-				if(ev[i] == maxVal) {
-					int nextState = state | (1 << i);
-					st.push(make_pair(i, nextState));
-					g[state].push_back(nextState);
+			for(int i = 0; i < s.size(); ++i) {
+				if((state >> i) & 0x01) {
+					const string &ev = s[i];
+					for(int j = 1; j < ev.size(); ++j) {
+						if(!((state >> j) & 0x01) && ev[j] == maxVal) {
+							int nextState = state | (1 << j);
+							st.push(nextState);
+							g[state].push_back(nextState);
+						}
+					}
 				}
 			}
 		}
@@ -56,20 +69,26 @@ public:
 	int reveal(vector<string> s) {
 		map<int,vector<int> > g = graph(s);
 		vector<int> ans(s.size(), INT_MAX);
-		map<int,bool> visit;
+		map<int,int> visit;
 		queue<pair<int,int> > q;
 		q.push(make_pair(0, 1 << 0));
+		visit[0] = -1;
 		while(!q.empty()) {
 			pair<int,int> p = q.front();
-			int selected = p.first;
-			int state = p.second;
+			int prev = p.first;
+			int cur = p.second;
+			int selected = __builtin_ctz(prev ^ cur);
 			q.pop();
 
-			if(visit[state])
+			if(visit[cur] > 0)
 				continue;
-			visit[state];
+			visit[cur] = visit[prev] + 1;
+			ans[selected] = min(ans[selected], visit[cur]);
 
-			const vector<int> &v = g[state];
+			const vector<int> &vs = g[cur];
+			for(int next : vs) {
+				q.push(make_pair(cur, next));
+			}
 		}
 
 		int answer = 0;
@@ -77,45 +96,6 @@ public:
 			answer += i * ans[i];
 		}
 		return answer;
-
-#if 0
-		vector<int> answer(s.size(), INT_MAX);
-		set<int> visitList;
-		int n = s.size();
-		visitList.insert(0);
-		answer[0] = 0;
-		s[0][0] = -1;
-		while(visitList.size() < n) {
-			char maxVal = '0' - 1;
-			for(int v : visitList) {
-				string &ev = s[v];
-				for(int i = 1; i < ev.size(); ++i) {
-					maxVal = max(maxVal, ev[i]);
-				}
-			}
-
-			set<int> maxList;
-			for(int v : visitList) {
-				string &ev = s[v];
-				for(int i = 1; i < ev.size(); ++i) {
-					if(ev[i] >= '0' && ev[i] == maxVal) {
-						maxList.insert(i);
-						answer[i] = min(answer[i], answer[v]+1);
-						s[v][i] = s[i][v] = '0' - 1;
-					}
-				}
-			}
-
-			visitList.insert(maxList.begin(), maxList.end());
-		}
-
-		int ans = 0;
-		for(int i = 1; i < answer.size(); ++i) {
-			ans += i * answer[i];
-		}
-
-		return answer;
-#endif
 	}
 };
 
