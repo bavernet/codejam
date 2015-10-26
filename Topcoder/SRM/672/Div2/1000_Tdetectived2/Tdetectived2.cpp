@@ -10,15 +10,22 @@
 #include <utility>
 #include <climits>
 
+#define VISITED(state, i) ((state >> i) & 0x01)
+
 using namespace std;
 
 class Tdetectived2 {
 private:
-	char getMax(const string &ev, int state) {
+	char getMax(const vector<string> &s, int state) {
 		char maxVal = -1;
-		for(int i = 1; i < ev.size(); ++i) {
-			if(!((state >> i) & 0x01) && maxVal < ev[i]) {
-				maxVal = ev[i];
+		for(int i = 0; i < s.size(); ++i) {
+			if(VISITED(state, i)) {
+				const string &ev = s[i];
+				for(int j = 1; j < ev.size(); ++j) {
+					if(!VISITED(state, j) && maxVal < ev[j]) {
+						maxVal = ev[j];
+					}
+				}
 			}
 		}
 		return maxVal;
@@ -38,22 +45,15 @@ private:
 				continue;
 			visit[state] = true;
 
-			char maxVal = -1;
-			for(int i = 0; i < s.size(); ++i) {
-				if((state >> i) & 0x01) {
-					const string &ev = s[i];
-					maxVal = max(maxVal, getMax(ev, state));
-				}
-			}
-
+			char maxVal = getMax(s, state);
 			if(maxVal < 0)
 				continue;
 
 			for(int i = 0; i < s.size(); ++i) {
-				if((state >> i) & 0x01) {
+				if(VISITED(state, i)) {
 					const string &ev = s[i];
 					for(int j = 1; j < ev.size(); ++j) {
-						if(!((state >> j) & 0x01) && ev[j] == maxVal) {
+						if(!VISITED(state, j) && ev[j] == maxVal) {
 							int nextState = state | (1 << j);
 							st.push(nextState);
 							g[state].push_back(nextState);
@@ -69,10 +69,10 @@ public:
 	int reveal(vector<string> s) {
 		map<int,vector<int> > g = graph(s);
 		vector<int> ans(s.size(), INT_MAX);
-		map<int,int> visit;
+		map<int,int> dist;
 		queue<pair<int,int> > q;
 		q.push(make_pair(0, 1 << 0));
-		visit[0] = -1;
+		dist[0] = -1;
 		while(!q.empty()) {
 			pair<int,int> p = q.front();
 			int prev = p.first;
@@ -80,10 +80,10 @@ public:
 			int selected = __builtin_ctz(prev ^ cur);
 			q.pop();
 
-			if(visit[cur] > 0)
+			if(dist[cur] > 0)
 				continue;
-			visit[cur] = visit[prev] + 1;
-			ans[selected] = min(ans[selected], visit[cur]);
+			dist[cur] = dist[prev] + 1;
+			ans[selected] = min(ans[selected], dist[cur]);
 
 			const vector<int> &vs = g[cur];
 			for(int next : vs) {
