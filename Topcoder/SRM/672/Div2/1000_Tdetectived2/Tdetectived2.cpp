@@ -1,13 +1,11 @@
 // problem: http://community.topcoder.com/stat?c=problem_statement&pm=14076&rd=16552
-// hint: graph, dfs, dp
+// hint: graph, bfs, dp
 // level: moderate
 #include <iostream>
 #include <vector>
 #include <string>
-#include <stack>
 #include <queue>
 #include <map>
-#include <utility>
 #include <climits>
 
 #define VISITED(state, i) ((state >> i) & 0x01)
@@ -30,16 +28,16 @@ private:
 		}
 		return maxVal;
 	}
-
-	map<int,vector<int> > graph(const vector<string> &s) {
-		map<int,vector<int> > g;
+public:
+	int reveal(vector<string> s) {
+		vector<int> ans(s.size(), INT_MAX);
 		map<int,bool> visit;
-		stack<int> st;
-
-		st.push(1 << 0);
-		while(!st.empty()) {
-			int state = st.top();
-			st.pop();
+		queue<int> q;
+		q.push(1 << 0);
+		ans[0] = 0;
+		while(!q.empty()) {
+			int state = q.front();
+			q.pop();
 
 			if(visit[state])
 				continue;
@@ -52,45 +50,17 @@ private:
 			for(int i = 0; i < s.size(); ++i) {
 				if(VISITED(state, i)) {
 					const string &ev = s[i];
+					int dist = __builtin_popcount(state);
 					for(int j = 1; j < ev.size(); ++j) {
 						if(!VISITED(state, j) && ev[j] == maxVal) {
 							int nextState = state | (1 << j);
-							st.push(nextState);
-							g[state].push_back(nextState);
+							ans[j] = min(ans[j], dist);
+							q.push(nextState);
 						}
 					}
 				}
 			}
 		}
-
-		return g;
-	}
-public:
-	int reveal(vector<string> s) {
-		map<int,vector<int> > g = graph(s);
-		vector<int> ans(s.size(), INT_MAX);
-		map<int,int> dist;
-		queue<pair<int,int> > q;
-		q.push(make_pair(0, 1 << 0));
-		dist[0] = -1;
-		while(!q.empty()) {
-			pair<int,int> p = q.front();
-			int prev = p.first;
-			int cur = p.second;
-			int selected = __builtin_ctz(prev ^ cur);
-			q.pop();
-
-			if(dist[cur] > 0)
-				continue;
-			dist[cur] = dist[prev] + 1;
-			ans[selected] = min(ans[selected], dist[cur]);
-
-			const vector<int> &vs = g[cur];
-			for(int next : vs) {
-				q.push(make_pair(cur, next));
-			}
-		}
-
 		int answer = 0;
 		for(int i = 1; i < ans.size(); ++i) {
 			answer += i * ans[i];
