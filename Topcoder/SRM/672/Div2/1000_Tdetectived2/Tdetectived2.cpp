@@ -13,28 +13,12 @@
 using namespace std;
 
 class Tdetectived2 {
-private:
-	char getMax(const vector<string> &s, int state) {
-		char maxVal = -1;
-		for(int i = 0; i < s.size(); ++i) {
-			if(VISITED(state, i)) {
-				const string &ev = s[i];
-				for(int j = 1; j < ev.size(); ++j) {
-					if(!VISITED(state, j) && maxVal < ev[j]) {
-						maxVal = ev[j];
-					}
-				}
-			}
-		}
-		return maxVal;
-	}
 public:
 	int reveal(vector<string> s) {
 		vector<int> ans(s.size(), INT_MAX);
 		map<int,bool> visit;
 		queue<int> q;
 		q.push(1 << 0);
-		ans[0] = 0;
 		while(!q.empty()) {
 			int state = q.front();
 			q.pop();
@@ -43,7 +27,17 @@ public:
 				continue;
 			visit[state] = true;
 
-			char maxVal = getMax(s, state);
+			char maxVal = -1;
+			for(int i = 0; i < s.size(); ++i) {
+				if(VISITED(state, i)) {
+					const string &ev = s[i];
+					for(int j = 1; j < ev.size(); ++j) {
+						if(!VISITED(state, j) && maxVal < ev[j]) {
+							maxVal = ev[j];
+						}
+					}
+				}
+			}
 			if(maxVal < 0)
 				continue;
 
