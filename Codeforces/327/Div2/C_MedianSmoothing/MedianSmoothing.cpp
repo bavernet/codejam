@@ -1,4 +1,4 @@
-// problem: http://codeforces.com/contest/586/problem/C
+// problem: http://codeforces.com/contest/591/problem/C
 // hint: greedy, implementation
 // level: easy
 #include <iostream>
