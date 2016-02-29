@@ -1,0 +1,7 @@
+6
+aa
+abcd
+aba
+abab
+aaaab
+onetwothreeonetwothree
