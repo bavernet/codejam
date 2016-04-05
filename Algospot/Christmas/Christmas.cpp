@@ -1,3 +1,6 @@
+// problem: https://algospot.com/judge/problem/read/CHRISTMAS
+// hint: math, dp, partial sum
+// level: moderate
 #include <iostream>
 #include <vector>
 
