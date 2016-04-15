@@ -1,4 +1,4 @@
-5
+6
 3
 abbab
 babab
@@ -23,3 +23,8 @@ abc
 abc
 abc
 abc
+3
+abcabcabc
+bcabcabca
+cabcabcab
+abcabcabc
