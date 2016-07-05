@@ -3,35 +3,8 @@
 // level: easy
 #include <iostream>
 #include <vector>
-#include <map>
 
 using namespace std;
-
-void getRectangles(map<int,int> &ans, const vector<int> &planks, int s, int e) {
-	int unit = (s > e)? -1: 1;
-	int prevH = planks[s];
-	int d = 1;
-	for (int i = s + unit; i != e; i += unit, ++d) {
-		if (prevH > planks[i]) {
-			ans[prevH] = d;
-			prevH = planks[i];
-		}
-	}
-	ans[prevH] = d;
-}
-
-int getMax(map<int,int> &src, map<int,int> &tgt) {
-	int ans = 0;
-	for (auto p : src) {
-		auto it = tgt.lower_bound(p.first);
-		if (it == tgt.end())
-			continue;
-
-		int width = p.second + it->second;
-		ans = max(ans, p.first * width);
-	}
-	return ans;
-}
 
 int getMaxRectangle(const vector<int> &planks, int s, int e) {
 	if (e - s == 0)
@@ -43,14 +16,22 @@ int getMaxRectangle(const vector<int> &planks, int s, int e) {
 	int m = (s + e) / 2;
 	int left = getMaxRectangle(planks, s, m);
 	int right = getMaxRectangle(planks, m, e);
-
-	map<int,int> leftRects, rightRects;
-	if (m > 0)  getRectangles(leftRects, planks, m - 1, -1);
-	if (m < e)  getRectangles(rightRects, planks, m, e);
-
 	int ans = max(left, right);
-	int mid = max(getMax(leftRects, rightRects), getMax(rightRects, leftRects));
-	return max(ans, mid);
+
+	int lo = m;
+	int hi = m + 1;
+	int minH = planks[m];
+	while (s < lo || hi < e) {
+		if (s < lo && (hi == e || planks[lo-1] > planks[hi])) {
+			--lo;
+			minH = min(minH, planks[lo]);
+		} else {
+			minH = min(minH, planks[hi]);
+			++hi;
+		}
+		ans = max(ans, minH * (hi - lo));
+	}
+	return ans;
 }
 
 int main(void) {
