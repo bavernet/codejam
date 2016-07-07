@@ -6,21 +6,17 @@
 
 using namespace std;
 
-string reverse(const string &s, int &cnt) {
-	if (s[0] != 'x')
-		return s;
+string reverse(const string &qt) {
+	if (qt[0] != 'x')
+		return qt;
 
-	string quad[4];
-	int scnt = 1;
-	for (int i = 0; i < 4; ++i, ++cnt) {
-		if (s[i+scnt] != 'x') {
-			quad[i] += s[i+scnt];
-		} else {
-			quad[i] = reverse(s.substr(i + scnt), scnt);
-		}
+	string s[4];
+	int cnt = 1;
+	for (int i = 0; i < 4; ++i) {
+		s[i] = (qt[cnt] != 'x')? string(1, qt[cnt]): reverse(qt.substr(cnt));
+		cnt += s[i].size();
 	}
-	cnt += scnt - 1;
-	return "x" + quad[2] + quad[3] + quad[0] + quad[1];
+	return "x" + s[2] + s[3] + s[0] + s[1];
 }
 
 int main(void) {
@@ -29,9 +25,8 @@ int main(void) {
 	cin >> nTests;
 	while (nTests--) {
 		string qtree;
-		int cnt = 0;
 		cin >> qtree;
-		cout << reverse(qtree, cnt) << endl;
+		cout << reverse(qtree) << endl;
 	}
 
 	return 0;
