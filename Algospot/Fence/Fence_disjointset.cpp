@@ -9,6 +9,30 @@
 
 using namespace std;
 
+inline bool left(map<int,int>::iterator grp, int i) {
+	return grp->first - 1 == i;
+}
+
+inline bool right(map<int,int>::iterator grp, int i) {
+	return grp->first + grp->second == i;
+}
+
+int merge(map<int,int> &m, map<int,int>::iterator lg, map<int,int>::iterator rg) {
+	lg->second += rg->second + 1;
+	m.erase(rg);
+	return lg->second;
+}
+
+int update(map<int,int> &m, map<int,int>::iterator grp, int i, bool erase) {
+	if (erase) {
+		m[i] = grp->second + 1;
+		m.erase(grp);
+		return m[i];
+	} else {
+		return ++grp->second;
+	}
+}
+
 int getMaxRectangle(const vector<int> &planks) {
 	int n = planks.size(), ans = 0;
 	vector<int> ind(n);
@@ -21,30 +45,17 @@ int getMaxRectangle(const vector<int> &planks) {
 	map<int,int> m;
 	ans = planks[ind[0]];
 	for (auto i : ind) {
-		auto it = m.lower_bound(i);
-		bool updated = false;
-		if (it != m.end()) {
-			if (it->first - 1 == i) {
-				m[i] = it->second + 1;
-				m.erase(it);
-				it = m.lower_bound(i);
-				ans = max(ans, m[i] * planks[i]);
-				updated = true;
-			}
-		}
-		if (it != m.begin()) {
-			auto nit = it--;
-			if (it->first + it->second == i) {
-				++it->second;
-				if (i == nit->first) {
-					it->second += nit->second - 1;
-					m.erase(nit);
-				}
-				ans = max(ans, it->second * planks[i]);
-				updated = true;
-			}
-		}
-		if (!updated) {
+		auto prev = m.lower_bound(i);
+		auto cur = (prev != m.begin())? prev--: prev;
+		bool bleft = (cur != m.end())? left(cur, i): false;
+		bool bright = (cur != m.begin())? right(prev, i): false;
+		if (bleft && bright) {
+			ans = max(ans, merge(m, prev, cur) * planks[i]);
+		} else if (bleft) {
+			ans = max(ans, update(m, cur, i, true) * planks[i]);
+		} else if (bright) {
+			ans = max(ans, update(m, prev, i, false) * planks[i]);
+		} else {
 			m[i] = 1;
 		}
 	}
@@ -60,12 +71,9 @@ int main(void) {
 	while (nTests--) {
 		int N;
 		cin >> N;
-
 		vector<int> planks(N);
-		for (int i = 0; i < N; ++i) {
+		for (int i = 0; i < N; ++i)
 			cin >> planks[i];
-		}
-
 		cout << getMaxRectangle(planks) << endl;
 	}
 
