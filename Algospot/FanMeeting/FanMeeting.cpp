@@ -21,6 +21,16 @@ void sub(vector<int> &a, vector<int> &b) {
 		a[i] -= b[i];
 }
 
+vector<int> mul(const vector<int> &a, const vector<int> &b) {
+	vector<int> ans(a.size() + b.size());
+	for (int i = 0; i < a.size(); ++i) {
+		for (int j = 0; j < b.size(); ++j) {
+			ans[i+j] += a[i] * b[j];
+		}
+	}
+	return ans;
+}
+
 vector<int> karatsuba(const vector<int> &a, const vector<int> &b) {
 	int na = a.size();
 	int nb = b.size();
@@ -30,6 +40,8 @@ vector<int> karatsuba(const vector<int> &a, const vector<int> &b) {
 		return vector<int>();
 	if (na == 1)
 		return vector<int>(1, a[0] * b[0]);
+	if (na <= 50)
+		return mul(a, b);
 
 	int half = na / 2;
 	vector<int> a0(a.begin(), a.begin() + half);
