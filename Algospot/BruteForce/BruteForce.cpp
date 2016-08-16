@@ -1,37 +1,24 @@
 // problem: https://algospot.com/judge/problem/read/BRUTEFORCE
-// hint: divide-and-conquer, dp
+// hint: divide-and-conquer
 // level: moderate
 #include <iostream>
 
-#define N_MAX       128
-#define AB_SHIFT    27
 #define MOD         1000000007
 #define mod(x)      (((unsigned long long)x) % MOD)
 
 using namespace std;
 
-int cache[N_MAX+1][AB_SHIFT+1];
-
-void initPowCache(void) {
-	for (int b = 1; b <= N_MAX; ++b) {
-		cache[b][0] = b;
-		for (int e = 1; e <= AB_SHIFT; ++e)
-			cache[b][e] = mod(cache[b][e-1] * cache[b][e-1]);
-	}
-}
-
 int mpow(int base, int exp) {
 	int ans = 1;
-	if (base == 1)
+	if (base == 1 || exp == 0)
 		return ans;
+	if (exp == 1)
+		return base;
+	if (exp & 0x01)
+		return mod(base * mpow(base, exp - 1));
 
-	while (exp) {
-		int x = exp & -exp;
-		int e = __builtin_ctz(x);
-		ans = mod(ans * cache[base][e]);
-		exp ^= x;
-	}
-	return ans;
+	int half = mpow(base, exp / 2);
+	return mod(half * half);
 }
 
 int getCases(int a, int b, int n) {
@@ -54,7 +41,6 @@ int main(void) {
 	cout.sync_with_stdio(false);
 	int nTests;
 	cin >> nTests;
-	initPowCache();
 	while (nTests--) {
 		int A, B, N;
 		cin >> A >> B >> N;
