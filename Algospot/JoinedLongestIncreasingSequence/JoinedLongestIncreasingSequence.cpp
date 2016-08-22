@@ -1,5 +1,5 @@
 // problem: https://algospot.com/judge/problem/read/JLIS
-// hint: dp
+// hint: dp, binary-search
 // level: easy
 #include <iostream>
 #include <vector>
@@ -10,21 +10,19 @@
 using namespace std;
 
 int getMaxLIS(vector<int> &a, vector<int> &is) {
-	int n = a.size(), ans = 0;
-	vector<int> len(n);
+	int n = a.size();
+	vector<int> lis;
 	for (int i = 0; i < n; ++i) {
 		if (binary_search(is.begin(), is.end(), a[i]))
 			continue;
 
-		len[i] = 1;
-		for (int j = 0; j < i; ++j) {
-			if (a[j] < a[i]) {
-				len[i] = max(len[i], len[j] + 1);
-			}
-		}
-		ans = max(ans, len[i]);
+		vector<int>::iterator it = lower_bound(lis.begin(), lis.end(), a[i]);
+		if (it != lis.end())
+			*it = a[i];
+		else
+			lis.push_back(a[i]);
 	}
-	return ans;
+	return lis.size();
 }
 
 int getMaxJLIS(vector<int> &a, vector<int> &b) {

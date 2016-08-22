@@ -1,25 +1,23 @@
 // problem: https://algospot.com/judge/problem/read/LIS
-// hint: dp
+// hint: dp, binary-search
 // level: easy
 #include <iostream>
 #include <vector>
+#include <algorithm>
 
 using namespace std;
 
 int getMaxLIS(vector<int> &seq) {
 	int n = seq.size();
-	vector<int> len(n);
-	int ans = 0;
+	vector<int> lis;
 	for (int i = 0; i < n; ++i) {
-		len[i] = 1;
-		for (int j = 0; j < i; ++j) {
-			if (seq[j] < seq[i]) {
-				len[i] = max(len[i], len[j] + 1);
-			}
-		}
-		ans = max(ans, len[i]);
+		vector<int>::iterator it = lower_bound(lis.begin(), lis.end(), seq[i]);
+		if (it != lis.end())
+			*it = seq[i];
+		else
+			lis.push_back(seq[i]);
 	}
-	return ans;
+	return lis.size();
 }
 
 int main(void) {
