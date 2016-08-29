@@ -15,8 +15,8 @@ void dijkstra(vector<map<int,int> > &g, int s) {
 	vector<int> d(N + 1, INT_MAX);
 	vector<int> visited(N + 1);
 
-	d[1] = 0;
-	pq.push(make_pair(0, 1));
+	d[s] = 0;
+	pq.push(make_pair(0, s));
 	while(!pq.empty()) {
 		pair<int,int> p = pq.top();
 		pq.pop();
