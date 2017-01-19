@@ -3,17 +3,28 @@
 #include <string>
 #include <sstream>
 #include <map>
+#include <cstring>
+#include <cmath>
 
 using namespace std;
 
-double prob(int h, int x, int y, map<int,map<int,double> > &dp) {
+#define X_MAX   (20)
+#define Y_MAX   (20)
+#define R_MAX   (6)
+#define H_MAX   (20000)
+
+int r[Y_MAX+1];
+double dp[H_MAX+1][X_MAX+1][R_MAX+1];
+
+static inline double prob(int h, int x, int y) {
 	if (h <= 0) return 1.0;
 	if (x == 0) return 0.0;
-	if (dp[x].find(h) != dp[x].end())
-		return dp[x][h];
-	double &p = dp[x][h];
+	double &p = dp[h][x][r[y]];
+	if (!isnan(p))
+		return p;
+	p = 0.0;
 	for (int i = y; i > 0; --i) {
-		double sp = prob(h - i, x - 1, y, dp);
+		double sp = prob(h - i, x - 1, y);
 		if (!sp)
 			break;
 		p += 1.0 / y * sp;
@@ -27,8 +38,7 @@ double prob(int h, string &spell) {
 	char c;
 	sin >> x >> c >> y >> z;
 	h -= z;
-	map<int,map<int,double> > dp;
-	return prob(h, x, y, dp);
+	return prob(h, x, y);
 }
 
 double win(int h, vector<string> &spells) {
@@ -44,6 +54,8 @@ double win(int h, vector<string> &spells) {
 int main(void) {
 	cout.sync_with_stdio(false);
 	int nTests;
+	memset(dp, 0xFF, sizeof(dp));
+	r[4] = 0, r[6] = 1, r[8] = 2, r[10] = 3, r[12] = 4, r[20] = 5;
 	cin >> nTests;
 	cout << fixed;
 	cout.precision(6);
