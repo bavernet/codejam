@@ -9,9 +9,9 @@
 using namespace std;
 
 bool split(const vector<int> &f, vector<int> &h, vector<int> &g) {
-	int n = f.size() - 1;
+	int n = f.size();
 	map<int,vector<int> > m;
-	for (int i = 1; i <= n; ++i)
+	for (int i = 0; i < n; ++i)
 		m[f[i]].push_back(i);
 
 	g.resize(n);
@@ -19,11 +19,11 @@ bool split(const vector<int> &f, vector<int> &h, vector<int> &g) {
 	for (const auto &p : m) {
 		int r = p.first;
 		const vector<int> &a = p.second;
-		if (!binary_search(a.begin(), a.end(), r))
+		if (!binary_search(a.begin(), a.end(), r - 1))
 			return false;
 		h.push_back(r);
 		for (auto ai : a)
-			g[ai-1] = i;
+			g[ai] = i;
 		++i;
 	}
 	return true;
@@ -33,8 +33,8 @@ int main(void) {
 	cout.sync_with_stdio(false);
 	int n = 0;
 	cin >> n;
-	vector<int> f(n + 1);
-	for (int i = 1; i <= n; ++i)
+	vector<int> f(n);
+	for (int i = 0; i < n; ++i)
 		cin >> f[i];
 
 	vector<int> h, g;
