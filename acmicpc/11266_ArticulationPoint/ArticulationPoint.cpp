@@ -3,36 +3,36 @@
 // level: moderate
 #include <iostream>
 #include <vector>
+#include <functional>
 #include <algorithm>
 using namespace std;
-
-void dfs(int u, int p, int &order, vector<int> &num, vector<int> &low, vector<int> &ap, const vector<vector<int> > &g) {
-	low[u] = num[u] = ++order;
-	bool isAP = false, isRoot = (p < 0);
-	int nChild = 0;
-	for (auto v : g[u]) {
-		if (v == p)
-			continue;
-		if (!num[v]) {
-			++nChild;
-			dfs(v, u, order, num, low, ap, g);
-			if (num[u] <= low[v])
-				isAP = true;
-		}
-		low[u] = min(low[u], low[v]);
-	}
-	if ((isRoot && nChild >= 2) || (!isRoot && isAP))
-		ap.push_back(u + 1);
-}
 
 vector<int> getAP(const vector<vector<int> > &g) {
 	int n = g.size();
 	vector<int> ap;
 	vector<int> num(n), low(n);
 	int order = 0;
+	function<void(int,int)> dfs = [&](int u, int p) {
+		low[u] = num[u] = ++order;
+		bool isAP = false, isRoot = (p < 0);
+		int nChild = 0;
+		for (auto v : g[u]) {
+			if (v == p)
+				continue;
+			if (!num[v]) {
+				++nChild;
+				dfs(v, u);
+				if (num[u] <= low[v])
+					isAP = true;
+			}
+			low[u] = min(low[u], low[v]);
+		}
+		if ((isRoot && nChild >= 2) || (!isRoot && isAP))
+			ap.push_back(u + 1);
+	};
 	for (int i = 0; i < n; ++i)
 		if (!num[i])
-			dfs(i, -1, order, num, low, ap, g);
+			dfs(i, -1);
 	sort(ap.begin(), ap.end());
 	return ap;
 }
