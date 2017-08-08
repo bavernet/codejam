@@ -7,20 +7,24 @@ using namespace std;
 int kmp(string s, string w) {
 	int n = s.size();
 	int k = w.size();
-	int i, j;
 	vector<int> lmt(k, 0);
-	for (i = 1; i < k; ++i)
-		if (w[lmt[i-1]] == w[i])
-			lmt[i] = lmt[i-1] + 1;
-
-	for (i = 0, j = 0; i < n && j < k; ++i, ++j) {
-		while (j > 0 && s[i] != w[j])
+	for (int i = 1; i < k; ++i) {
+		int j = lmt[i-1];
+		while (j > 0 && w[i] != w[j])
 			j = lmt[j-1];
-		if (s[i] != w[j])
-			--j;
+		if (w[i] == w[j])
+			lmt[i] = j + 1;
 	}
 
-	return (j == k)? (i - k): -1;
+	for (int i = 0, j = 0; i < n; ++i) {
+		while (j > 0 && s[i] != w[j])
+			j = lmt[j-1];
+		if (s[i] == w[j])
+			++j;
+		if (j == k)
+			return i - k + 1;
+	}
+	return -1;
 }
 
 int main(void) {
