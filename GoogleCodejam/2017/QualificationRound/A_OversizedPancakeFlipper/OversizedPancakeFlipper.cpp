@@ -1,20 +1,29 @@
 #include <iostream>
 #include <string>
+#include <queue>
 using namespace std;
 
 int flip(int k, string &s) {
 	int n = s.size();
 	int ans = 0;
-	for (int i = 0; i < n - k + 1; ++i) {
-		if (s[i] == '+')
+	queue<int> q;
+	char happy = '+';
+	for (int i = 0; i < n; ++i) {
+		if (q.size() && q.front() == i) {
+			q.pop();
+			happy = (happy == '+')? '-': '+';
+		}
+
+		if (s[i] == happy)
 			continue;
-		++ans;
-		for (int j = i; j < i + k; ++j)
-			s[j] = (s[j] == '+')? '-': '+';
-	}
-	for (int i = n - k; i < n; ++i)
-		if (s[i] == '-')
+
+		if (i > n - k)
 			return -1;
+
+		++ans;
+		happy = (happy == '+')? '-': '+';
+		q.push(i + k);
+	}
 	return ans;
 }
 
