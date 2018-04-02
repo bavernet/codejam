@@ -16,7 +16,7 @@ pair<long long, long long> stall(long long n, long long k) {
 		--unit;
 	long long left = unit / 2;
 	long long right = unit - left;
-	return make_pair(max(left, right), min(left, right));
+	return make_pair(right, left);
 }
 
 int main(void) {
