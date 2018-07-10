@@ -4,25 +4,23 @@
 
 using namespace std;
 
-int kmp(string s, string w) {
-	int n = s.size();
-	int k = w.size();
-	vector<int> lmt(k, 0);
-	for (int i = 1; i < k; ++i) {
-		int j = lmt[i-1];
-		while (j > 0 && w[i] != w[j])
+int kmp(const string &word, const string &txt) {
+	int n = txt.size();
+	int k = word.size();
+	vector<int> lmt(k);
+	for (int i = 1, j = 0; i < k; ++i) {
+		while (j > 0 && word[i] != word[j])
 			j = lmt[j-1];
-		if (w[i] == w[j])
-			lmt[i] = j + 1;
+		if (word[i] == word[j])
+			lmt[i] = ++j;
 	}
 
 	for (int i = 0, j = 0; i < n; ++i) {
-		while (j > 0 && s[i] != w[j])
+		while (j > 0 && txt[i] != word[j])
 			j = lmt[j-1];
-		if (s[i] == w[j])
-			++j;
-		if (j == k)
-			return i - k + 1;
+		if (txt[i] == word[j])
+			if (++j == k)
+				return i - k + 1;
 	}
 	return -1;
 }
@@ -34,7 +32,7 @@ int main(void) {
 	while (nTests--) {
 		string sentence, word;
 		cin >> sentence >> word;
-		cout << kmp(sentence, word) << endl;
+		cout << kmp(word, sentence) << endl;
 	}
 
 	return 0;
